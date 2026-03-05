@@ -1,5 +1,4 @@
-#include<cctype>
-#include<cstudio>
+#include "lexer/lexer.hpp"
 
 int gettok(){
     static int LastChar = ' ';
