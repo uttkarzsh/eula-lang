@@ -2,6 +2,7 @@
 
 std::string IdentifierStr;
 double NumVal;
+static int CurTok;
 
 int gettok(){
     static int LastChar = ' ';
@@ -56,4 +57,8 @@ int gettok(){
     int ThisChar = LastChar;
     LastChar = getchar();
     return ThisChar;
+}
+
+static int getNextToken(){
+    return CurTok = gettok();
 }

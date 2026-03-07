@@ -42,20 +42,20 @@ public:
 };
 
 // prototype for the function
-class ProtoypeAST {
+class PrototypeAST {
     std::string Name;
     std::vector<std::string> Args;
 
 public:
-    ProtoypeAST(std::string &Name, std::vector<std::string> Args): Name(Name), Args(std::move(Args)) {}
+    PrototypeAST(std::string &Name, std::vector<std::string> Args): Name(Name), Args(std::move(Args)) {}
     const std::string getName() const { return Name; }
 };
 
 // function definition
 class FunctionAST {
-    std::unique_ptr<ProtoypeAST> Proto;
+    std::unique_ptr<PrototypeAST> Proto;
     std::unique_ptr<ExprAST> Body;
 
 public:
-    FunctionAST(std::unique_ptr<ProtoypeAST> Proto, std::unique_ptr<ExprAST> Body) : Proto(std::move(Proto)), Body(std::move(Body)) {}
+    FunctionAST(std::unique_ptr<PrototypeAST> Proto, std::unique_ptr<ExprAST> Body) : Proto(std::move(Proto)), Body(std::move(Body)) {}
 };
