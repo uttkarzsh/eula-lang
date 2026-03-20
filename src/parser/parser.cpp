@@ -4,7 +4,7 @@
 // auto RHS = std::make_unique<VariableExprAST>("y");
 // auto Result = std::make_unique<BinaryExprAST>('+', std::move(LHS), std::move(RHS));
 
-static std::unique_ptr<ExprAST> ParseExpression(){}
+std::map<char, int> BinopPrededence;
 
 static std::unique_ptr<ExprAST> ParseNumberExpr(){
     auto Result = std::make_unique<NumberExprAST>(NumVal);
@@ -39,13 +39,64 @@ static std::unique_ptr<ExprAST> ParseIdentifierExpr(){
             if (CurTok == ')')
                 break;
 
-            if (CurTok != ')')
+            if (CurTok != ',')
                 return LogError("bruh where ur ')' or ',' in argument list??");
-            
                 getNextToken();
         }
     }
 
     getNextToken();
     return std::make_unique<CallExprAST>(IdName, std::move(Args));
+}
+
+static std::unique_ptr<ExprAST> ParsePrimary(){
+    switch(CurTok){
+        case tok_identifier: 
+            return ParseIdentifierExpr();
+        case tok_number:
+            return ParseNumberExpr();
+        case '(':
+            return ParseParenExpr();
+        default: 
+            return LogError("unknown token when expecting an expression");
+    }
+}
+
+static int GetTokPrecedence(){
+    if(!isascii(CurTok))
+        return -1;
+    
+    int TokPrec = BinopPrededence[CurTok];
+    if(TokPrec <= 0)
+        return -1;
+    return TokPrec;
+}
+
+ static std::unique_ptr<ExprAST> ParseExpression(){
+    auto LHS = ParsePrimary();
+    if(!LHS) return nullptr;
+
+    return ParseBinOpRHS(0, std::move(LHS));
+}
+
+static std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS){
+    while(true){
+        int TokPrec = GetTokPrecedence();
+        if (TokPrec < ExprPrec)
+            return LHS;
+
+        int BinOp = CurTok;
+        getNextToken();
+
+        auto RHS = ParsePrimary();
+        if(!RHS) return nullptr;
+
+        int NextPrec = GetTokPrecedence();
+        if(TokPrec < NextPrec){
+            RHS = ParseBinOpRHS(TokPrec + 1, std::move(RHS));
+            if(!RHS) return nullptr;
+        }
+
+        LHS = std::make_unique<BinaryExprAST>(BinOp, std::move(LHS), std::move(RHS));
+    }
 }
