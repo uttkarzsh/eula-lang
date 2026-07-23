@@ -14,7 +14,7 @@ add_library(logger
     logger/logger.cpp
 )
 
-add_executable(kalell
+add_executable(eula
     main.cpp
 )
 
